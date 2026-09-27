@@ -1,0 +1,5 @@
+# name cv tHi tLo hHi hLo gas hrLo hrHi sp buz
+default 38972 400 100 900 200 50 50 120 90 1
+demo-temp-low 48791 250 100 900 200 50 50 120 90 1
+all-changed 19795 450 -50 700 300 25 60 140 94 0
+zeros-edges 10012 600 -200 1000 0 1 20 200 50 0

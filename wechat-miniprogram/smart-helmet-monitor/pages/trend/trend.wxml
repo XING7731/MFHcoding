@@ -1,0 +1,107 @@
+<!-- pages/trend/trend.wxml —— 趋势图（canvas 折线）与报警记录 -->
+<view class="page">
+
+  <!-- ============ 指标切换 ============ -->
+  <view class="section-title">选择要看的图形</view>
+  <scroll-view class="tabs" scroll-x enable-flex>
+    <view class="tab {{item.key === activeKey ? 'tab-on' : ''}}"
+          wx:for="{{views}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="onPickMetric">{{item.name}}</view>
+  </scroll-view>
+
+  <!-- ============ 趋势折线图 ============ -->
+  <view wx:if="{{!empty}}" class="card card-full">
+
+    <!-- 图例：哪个颜色是哪条线，右侧跟最新值 -->
+    <view class="legend">
+      <view class="lg-item" wx:for="{{legend}}" wx:key="key">
+        <view class="lg-dot" style="background: {{item.color}}"></view>
+        <text class="lg-name">{{item.name}}</text>
+        <text class="lg-val">{{item.last}} <text class="lg-unit">{{item.unit}}</text></text>
+      </view>
+    </view>
+
+    <canvas type="2d" id="trend-canvas" class="chart-canvas"></canvas>
+
+    <view class="axis">
+      <text>{{count}} 个点 · 起 {{fromTime}}</text>
+      <text>止 {{toTime}}</text>
+    </view>
+
+    <text wx:if="{{drawNote}}" class="draw-note">{{drawNote}}</text>
+
+    <!-- 统计值：canvas 万一画不出来，这些数仍然可读 -->
+    <view class="stat" wx:for="{{legend}}" wx:key="key">
+      <view class="stat-head">
+        <view class="lg-dot" style="background: {{item.color}}"></view>
+        <text class="stat-name">{{item.name}}</text>
+        <text class="stat-n">{{item.valid}} 个有效值</text>
+      </view>
+      <view class="stat-grid">
+        <view class="sg">
+          <text class="sg-k">最新</text>
+          <text class="sg-v">{{item.last}} {{item.unit}}</text>
+        </view>
+        <view class="sg">
+          <text class="sg-k">最高</text>
+          <text class="sg-v">{{item.max}} {{item.unit}}</text>
+        </view>
+        <view class="sg">
+          <text class="sg-k">最低</text>
+          <text class="sg-v">{{item.min}} {{item.unit}}</text>
+        </view>
+        <view class="sg">
+          <text class="sg-k">平均</text>
+          <text class="sg-v">{{item.avg}} {{item.unit}}</text>
+        </view>
+      </view>
+    </view>
+
+    <text class="chart-note">
+      折线遇到没测到的点会【断开】—— 断开的意思是"这一刻没测到"，不是 0。
+      心率/血氧未佩戴时就是这个样子；单指标图的橙色虚线是报警门限。
+    </text>
+    <text class="chart-note">
+      门限线取的是【你在「阈值设置」里保存的那一套】，和设备侧生效的门限可能还差一次下发
+      （到实时监测页底部看 cv 指纹就知道同步没有）。撞击那条线不可在线配置，
+      仍按固件编译期常量画。
+    </text>
+  </view>
+
+  <view wx:else class="empty">
+    <text class="empty-title">还没有攒到数据</text>
+    <text class="empty-sub">趋势点是小程序在轮询到新报文时自己攒的（每 10 秒一条，约 40 分钟攒满 240 条）。</text>
+    <text class="empty-sub">先回「实时监测」页看数据是否正常，再回来这里。</text>
+  </view>
+
+  <!-- ============ 报警记录 ============ -->
+  <view class="section-title">报警记录（{{alarmCount}} 条）</view>
+
+  <block wx:if="{{alarmCount > 0}}">
+    <view class="alarm-item alarm-{{item.level}}" wx:for="{{alarms}}" wx:key="seq">
+      <view class="alarm-head">
+        <text class="alarm-cn">{{item.cn}}</text>
+        <text class="alarm-time">{{item.time}}</text>
+      </view>
+      <text class="alarm-code">状态码 {{item.st}} · seq {{item.seq}}</text>
+    </view>
+  </block>
+  <view wx:else class="empty empty-sm">
+    <text class="empty-sub">暂无报警。设备上报 normal 时不记流水，只有真实告警状态才会记一条。</text>
+  </view>
+
+  <!-- ============ 操作 ============ -->
+  <view class="btn-row">
+    <view class="btn btn-ghost" bindtap="onBack">回到实时监测</view>
+    <view class="btn btn-danger" bindtap="onClear">清空本机记录</view>
+  </view>
+
+  <text class="footnote">
+    说明：巴法云的 HTTP 接口只提供「该主题最新一条消息」，不提供历史查询，
+    所以这里的趋势与记录都是小程序本机缓存，卸载小程序或清空后会丢失。
+    折线图由 utils/chart.js 计算后画在 canvas 上（不依赖任何 npm 图表库）。
+  </text>
+
+</view>

@@ -1,0 +1,182 @@
+/* pages/settings/settings.wxss —— 阈值设置页
+ * 公共样式（卡片 / 按钮 / 键值行 / 错误框）在 app.wxss，这里只放本页特有的。
+ */
+
+/* ---------- 当前读数条 ---------- */
+.cura {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 22rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--line);
+  margin-bottom: 12rpx;
+}
+.cura-l { flex: 1; min-width: 0; }
+.cura-t { display: block; font-weight: 600; }
+.cura-s { display: block; font-size: 22rpx; color: var(--sub); margin-top: 2rpx; }
+
+/* 分组标题右侧的"当前 xx"—— 让人一边拖滑块一边能看到实时值 */
+.cur-inline {
+  float: right;
+  font-size: 22rpx;
+  color: var(--primary);
+  letter-spacing: 0;
+}
+
+/* ---------- 指纹核对 ---------- */
+.cvbox {
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--line);
+  border-left: 8rpx solid var(--sub);
+  padding: 20rpx 22rpx;
+  margin: 12rpx 0 4rpx;
+}
+.cv-ok   { border-left-color: var(--ok); }
+.cv-warn { border-left-color: var(--warn); }
+.cv-info { border-left-color: var(--info); }
+
+.cv-title { display: block; font-weight: 700; font-size: 28rpx; margin-bottom: 6rpx; }
+.cv-ok   .cv-title { color: var(--ok); }
+.cv-warn .cv-title { color: var(--warn); }
+.cv-info .cv-title { color: var(--info); }
+
+.cv-text { display: block; font-size: 24rpx; color: var(--text); margin-bottom: 8rpx; }
+
+.mono-cv {
+  font-family: Consolas, Menlo, monospace;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ---------- 门限行 ---------- */
+.trow {
+  padding: 18rpx 0 14rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.trow:last-child { border-bottom: none; }
+
+.trow-head {
+  display: flex;
+  align-items: flex-start;
+}
+.trow-name { flex: 1; min-width: 0; }
+.tn { display: block; font-size: 28rpx; font-weight: 600; }
+.th { display: block; font-size: 21rpx; color: var(--sub); margin-top: 2rpx; }
+
+.trow-val {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 滑块与加减按钮同一行：粗调用滑块，微调用按钮，两种手感都留着 */
+.trow-ctl {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+}
+.stp {
+  flex: none;
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 62rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  background: #eef2f8;
+  color: var(--primary);
+  font-size: 36rpx;
+  font-weight: 700;
+}
+.stp:active { background: #dfe7f2; }
+.sld { flex: 1; margin: 0 8rpx; }
+
+.trow-foot {
+  display: flex;
+  align-items: center;
+  margin-top: -4rpx;
+}
+.lim { font-size: 20rpx; color: var(--sub); }
+.usecur {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: var(--primary);
+  background: #eef2f8;
+  border-radius: 20rpx;
+  padding: 6rpx 18rpx;
+}
+.usecur:active { background: #dfe7f2; }
+
+/* ---------- 蜂鸣器开关行 ---------- */
+.swrow {
+  display: flex;
+  align-items: center;
+  padding: 6rpx 0 4rpx;
+}
+.swrow .trow-name { margin-right: 16rpx; }
+
+/* ---------- 报文预览 ---------- */
+.msgbox {
+  font-family: Consolas, Menlo, monospace;
+  font-size: 21rpx;
+  line-height: 1.55;
+  color: #24405c;
+  background: #f4f7fb;
+  border: 1rpx solid var(--line);
+  border-radius: 10rpx;
+  padding: 14rpx 16rpx;
+  margin-top: 8rpx;
+  word-break: break-all;
+}
+
+/* ---------- 量程速查 ---------- */
+.rgrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 8rpx;
+}
+.rchip {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  background: #f7f9fc;
+  border: 1rpx solid var(--line);
+  border-radius: 10rpx;
+  padding: 8rpx 14rpx;
+}
+.rchip .rk {
+  font-family: Consolas, Menlo, monospace;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 22rpx;
+}
+.rchip .rv { font-size: 21rpx; color: var(--text); }
+.rchip .rx { font-size: 18rpx; color: var(--sub); }
+
+/* 不能下发时按钮变灰，给一个"按不动"的视觉预期 */
+.btn-off { background: #b9c4d4; color: #fff; }
+
+/* ---------- 下发结果 ---------- */
+.sendres {
+  border-radius: 12rpx;
+  padding: 14rpx 16rpx;
+  margin-top: 16rpx;
+}
+.sendres-ok  { background: #e7f8f1; border: 1rpx solid #b8e6d3; }
+.sendres-bad { background: #fdeaea; border: 1rpx solid #f6c9cb; }
+.sr-t { display: block; font-size: 24rpx; font-weight: 600; }
+.sendres-ok  .sr-t { color: #0a8f66; }
+.sendres-bad .sr-t { color: var(--danger); }
+.sr-s {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text);
+  margin-top: 4rpx;
+  line-height: 1.55;
+  word-break: break-all;
+}

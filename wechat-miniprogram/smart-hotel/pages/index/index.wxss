@@ -1,0 +1,297 @@
+/* pages/index/index.wxss */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 24rpx;
+  box-sizing: border-box;
+}
+
+/* ---------------- 房间切换 ---------------- */
+.room-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #ffffff;
+  box-shadow: 0 2rpx 12rpx rgba(31, 41, 55, 0.04);
+}
+
+/* ---------------- 告警条 ---------------- */
+.alarm-bar {
+  margin: 24rpx 24rpx 0;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+/* ---------------- 实时环境 ---------------- */
+.metric-grid {
+  display: flex;
+  margin: 8rpx 0 24rpx;
+}
+
+.metric {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.metric + .metric {
+  border-left: 1rpx solid var(--line);
+}
+
+.metric__icon {
+  width: 84rpx;
+  height: 84rpx;
+  margin-bottom: 12rpx;
+}
+
+.metric__label {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+.metric__value {
+  display: flex;
+  align-items: baseline;
+  margin-top: 6rpx;
+}
+
+.metric__number {
+  font-size: 64rpx;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--brand);
+}
+
+.metric__unit {
+  margin-left: 6rpx;
+  font-size: 26rpx;
+  color: var(--text-2);
+}
+
+.metric-foot {
+  display: flex;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.metric-foot__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-foot__label {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+.metric-foot__value {
+  margin-top: 8rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--text-1);
+}
+
+/* ---------------- 舒适度设定 ---------------- */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+}
+
+.setting-row__label {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: var(--text-2);
+}
+
+.setting-row__icon {
+  width: 46rpx;
+  height: 46rpx;
+  margin-right: 14rpx;
+}
+
+/* ---------------- 加湿器 ---------------- */
+.humi-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8rpx 0 28rpx;
+}
+
+.humi-stage__image {
+  width: 260rpx;
+  height: 260rpx;
+}
+
+.humi-stage__tip {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.mode-row {
+  display: flex;
+  margin-bottom: 24rpx;
+}
+
+.mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  padding: 0;
+  margin: 0 12rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--text-2);
+  background-color: #f5f7fa;
+  border-radius: 16rpx;
+  line-height: 1;
+}
+
+.mode-btn:first-child {
+  margin-left: 0;
+}
+
+.mode-btn:last-child {
+  margin-right: 0;
+}
+
+.mode-btn::after {
+  border: none;
+}
+
+.mode-btn.is-active {
+  color: #ffffff;
+  background-color: var(--brand);
+}
+
+.mode-btn__icon {
+  width: 44rpx;
+  height: 44rpx;
+  margin-right: 12rpx;
+}
+
+.power-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  padding: 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  color: #ffffff;
+}
+
+.power-btn::after {
+  border: none;
+}
+
+.power-btn--on {
+  background-color: var(--brand);
+}
+
+.power-btn--off {
+  background-color: #eceff4;
+  color: var(--text-2);
+}
+
+.power-btn.is-disabled {
+  background-color: #eef1f6;
+  color: var(--text-3);
+}
+
+.humi-tip {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ---------------- 灯光 ---------------- */
+.light-grid {
+  display: flex;
+}
+
+.light-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 16rpx;
+  background-color: #f7f9fc;
+  border: 2rpx solid transparent;
+  border-radius: 16rpx;
+}
+
+.light-item:first-child {
+  margin-right: 20rpx;
+}
+
+.light-item.is-on {
+  background-color: rgba(25, 118, 210, 0.06);
+  border-color: rgba(25, 118, 210, 0.28);
+}
+
+.light-item__lamp {
+  width: 140rpx;
+  height: 140rpx;
+  margin-bottom: 12rpx;
+}
+
+.light-item__row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.light-item__mini {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 8rpx;
+}
+
+.light-item__name {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-1);
+}
+
+/* ---------------- 底部入口 ---------------- */
+.footer-actions {
+  display: flex;
+  margin: 24rpx 24rpx 0;
+}
+
+.footer-actions__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28rpx 24rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(31, 41, 55, 0.05);
+}
+
+.footer-actions__item:first-child {
+  margin-right: 20rpx;
+}
+
+.footer-actions__title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.footer-actions__desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}

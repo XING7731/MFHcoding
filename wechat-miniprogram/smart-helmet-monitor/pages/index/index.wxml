@@ -1,0 +1,275 @@
+<!-- pages/index/index.wxml —— 实时监测页 -->
+<view class="page">
+
+  <!-- ============ 报警横幅：只在后端上报非 normal 状态时出现 ============ -->
+  <view wx:if="{{st.level === 'danger' || st.level === 'warn'}}" class="banner banner-{{st.level}}">
+    <view class="banner-icon">{{st.icon}}</view>
+    <view class="banner-body">
+      <text class="banner-title">{{st.cn}}</text>
+      <text class="banner-sub">设备上报状态码：{{rawSt}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 阈值预警横幅 ============
+       与上面那条【不是一回事】：
+         · 上面那条来自设备上报的 st 字段 —— 是【固件自己判定】的结果（蜂鸣器也是它驱动的）；
+         · 这一条来自本机保存的门限与实时读数比对 —— 是【小程序侧】的二次判读，
+           与板子响不响完全无关。
+       ★ 所以：只要板子还在上报读数，哪怕它的蜂鸣器被关掉了、哪怕它的门限
+         和本机不一致，这一条都会照常出现。这就是"不用板子报警、只用小程序告警"
+         所要的那条链路。
+       只出现这一条、没有上面那条时，多半是因为板子那边不认为越限（门限不同或
+       蜂鸣被静音）—— 对"只用小程序告警"的用法来说，这恰恰是正常状态。 -->
+  <view wx:if="{{tips.length > 0}}" class="banner banner-warn">
+    <view class="banner-icon">!</view>
+    <view class="banner-body">
+      <text class="banner-title">阈值预警（{{tips.length}} 项）· 小程序判定</text>
+      <text class="banner-sub" wx:for="{{tips}}" wx:key="key">· {{item.text}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 连接 / 新鲜度 ============ -->
+  <view class="conn conn-{{fresh.level}}">
+    <view class="conn-dot"></view>
+    <text class="conn-text">{{fresh.text}}</text>
+    <text class="conn-time">云端 {{cloudTime}}</text>
+  </view>
+
+  <!-- 取数通道：实时推送 or 轮询。两条白名单是独立的两栏，配错哪栏都能从这行看出来 -->
+  <view class="chan chan-{{chan.level}}">
+    <text class="chan-tag">{{chan.kind === 'wss' ? 'WSS 推送' : 'HTTP 轮询'}}</text>
+    <text class="chan-text">{{chan.text}}</text>
+    <text class="chan-detail" wx:if="{{chan.detail}}">{{chan.detail}}</text>
+  </view>
+
+  <!-- ============ 错误提示 ============ -->
+  <view wx:if="{{errMsg}}" class="errbox">
+    <text class="err-title">获取数据失败</text>
+    <text class="err-msg">{{errMsg}}</text>
+    <!-- 原始 errMsg 单独一行、保留原文。它是唯一的一手证据：
+         我的"建议"只是推测，推测不对时就看这一行。 -->
+    <text class="err-raw" wx:if="{{errRaw}}">原始 errMsg：{{errRaw}}</text>
+    <view class="btn btn-primary btn-sm err-btn" bindtap="onDiagnose">
+      {{diagRunning ? '诊断中…' : '一键连接诊断'}}
+    </view>
+  </view>
+
+  <!-- ============ 连接诊断报告 ============ -->
+  <view wx:if="{{diag}}" class="diagbox diag-{{diag.level}}">
+    <text class="diag-verdict">{{diag.level === 'ok' ? '✓ ' : '! '}}{{diag.verdict}}</text>
+    <view class="kv" wx:for="{{diag.rows}}" wx:key="k">
+      <text class="kk">{{item.k}}</text>
+      <text class="vv">{{item.v}}</text>
+    </view>
+    <text class="diag-tip">{{diag.tip}}</text>
+    <view class="btn-row">
+      <view class="btn btn-ghost btn-sm" bindtap="onDiagnose">{{diagRunning ? '诊断中…' : '重新诊断'}}</view>
+      <view class="btn btn-ghost btn-sm" bindtap="onManualRefresh">立即刷新数据</view>
+    </view>
+    <text class="diag-at">诊断时间 {{diag.at}}</text>
+  </view>
+
+  <!-- ============ 生命体征 ============ -->
+  <view class="section-title">生命体征</view>
+  <view class="grid">
+    <view class="card card-half">
+      <text class="k">心率 HR</text>
+      <view class="vrow">
+        <text class="v {{v.hrCls}}">{{v.hr}}</text>
+        <text class="u">bpm</text>
+      </view>
+      <text class="note">{{v.hrNote}}</text>
+    </view>
+    <view class="card card-half">
+      <text class="k">血氧 SpO2</text>
+      <view class="vrow">
+        <text class="v {{v.spo2Cls}}">{{v.spo2}}</text>
+        <text class="u">%</text>
+      </view>
+      <text class="note">{{v.spo2Note}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 环境 ============ -->
+  <view class="section-title">环境监测</view>
+  <view class="grid">
+    <view class="card card-half">
+      <text class="k">温度</text>
+      <view class="vrow">
+        <text class="v {{v.tempCls}}">{{v.temp}}</text>
+        <text class="u">℃</text>
+      </view>
+      <text class="note">{{v.tempNote}}</text>
+    </view>
+    <view class="card card-half">
+      <text class="k">湿度</text>
+      <view class="vrow">
+        <text class="v {{v.humiCls}}">{{v.humi}}</text>
+        <text class="u">%RH</text>
+      </view>
+      <text class="note">{{v.humiNote}}</text>
+    </view>
+    <view class="card card-half">
+      <text class="k">气体 MQ-2</text>
+      <view class="vrow">
+        <text class="v {{v.gasCls}}">{{v.gas}}</text>
+        <text class="u">/100</text>
+      </view>
+      <text class="note">{{v.gasNote}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 姿态 / 摔倒检测 ============ -->
+  <view class="section-title">姿态与撞击检测</view>
+  <view class="grid">
+    <view class="card card-full">
+      <text class="k">合加速度 |a|（摔倒判据门限 2.5g）</text>
+      <view class="vrow">
+        <text class="v {{v.accCls}}">{{v.accel}}</text>
+        <text class="u">g</text>
+      </view>
+      <text class="note">姿态判定：{{v.posture}} · {{v.accNote}}</text>
+      <text class="note">判读要点：静止平放时 |a| 应≈1.0g；若长期远大于 1g，多半是 MPU6050 量程换算或零偏问题，不是"一直在撞击"</text>
+    </view>
+    <view class="card card-half">
+      <text class="k">三轴加速度 (g)</text>
+      <text class="note">X {{v.ax}}　Y {{v.ay}}　Z {{v.az}}</text>
+    </view>
+    <view class="card card-half">
+      <text class="k">当前状态</text>
+      <text class="note">{{st.cn}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 设备信息 ============ -->
+  <view class="section-title">设备与链路</view>
+  <view class="card card-full">
+    <view class="kv">
+      <text class="kk">取数通道</text>
+      <text class="vv">{{chan.kind === 'wss' ? 'WSS 实时推送' : 'HTTP 轮询'}}</text>
+    </view>
+    <view class="kv">
+      <text class="kk">报文序号 seq</text>
+      <text class="vv">{{v.seq}}</text>
+    </view>
+    <!-- 设备此刻在 PPG 测量流程的哪一步（未检测到手指 / 稳定中 / 采集中 / 已完成）。
+         心率是"一次测量"，有 13 秒里 hr 必然是 --，只有这一行能说明它在忙还是没测到 -->
+    <view class="kv">
+      <text class="kk">PPG 状态</text>
+      <text class="vv">{{v.ppgText}}</text>
+    </view>
+    <view class="kv">
+      <text class="kk">设备运行时长</text>
+      <text class="vv">{{v.uptime}}</text>
+    </view>
+    <view class="kv">
+      <text class="kk">设备本地时间</text>
+      <text class="vv">{{v.devTime}}</text>
+    </view>
+    <view class="kv">
+      <text class="kk">时间戳状态</text>
+      <text class="vv">{{v.tsvText}}</text>
+    </view>
+    <view class="kv">
+      <text class="kk">本次会话</text>
+      <text class="vv">轮询 {{pollCount}} 次 · 新增 {{newCount}} 条</text>
+    </view>
+    <view class="kv" wx:if="{{seqGap}}">
+      <text class="kk">序号变化</text>
+      <text class="vv">{{seqGap}}</text>
+    </view>
+    <!-- 设备当前生效的门限指纹。与本机门限算出的指纹不一致 = 门限还没下发到设备 -->
+    <view class="kv">
+      <text class="kk">门限配置</text>
+      <text class="vv">{{cvText}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 门限提示 ============ -->
+  <block wx:if="{{tips.length > 0}}">
+    <view class="section-title">越限项（按你在「阈值设置」保存的门限判定）</view>
+    <view class="tips">
+      <text class="tip" wx:for="{{tips}}" wx:key="key">{{item.text}}</text>
+    </view>
+    <text class="note">
+      这条是【小程序自己】按本机门限判的，与板子的蜂鸣器相互独立 ——
+      板子不响也照样会在这里列出来（板子静音见「阈值设置」页的蜂鸣开关）。
+    </text>
+    <text class="note">
+      想让某一项现在就告警：到「阈值设置」把它调到比当前读数更严一点，
+      点「仅存本机」即可 —— 不需要下发设备。
+    </text>
+  </block>
+
+  <!-- ============ 操作 ============ -->
+  <view class="btn-row">
+    <view class="btn btn-ghost" bindtap="onManualRefresh">立即刷新</view>
+    <view class="btn btn-ghost" bindtap="onTogglePause">{{paused ? '继续轮询' : '暂停轮询'}}</view>
+    <view class="btn btn-ghost" bindtap="onOpenTrend">看趋势</view>
+  </view>
+  <view class="btn-row">
+    <view class="btn btn-primary" bindtap="onOpenSettings">阈值设置（温湿度 / 心率 / 气体）</view>
+  </view>
+
+  <!-- ============ 连接设置 ============ -->
+  <view class="section-title" bindtap="onToggleSetting">
+    连接设置（{{showSetting ? '点击收起' : '点击展开'}}）
+  </view>
+  <view wx:if="{{showSetting}}" class="card card-full">
+    <view class="field">
+      <text class="label">巴法云私钥</text>
+      <input value="{{uidInput}}" bindinput="onUidInput" placeholder="32 位私钥" />
+    </view>
+    <view class="field">
+      <text class="label">主题名</text>
+      <input value="{{topicInput}}" bindinput="onTopicInput" placeholder="如 temp001" />
+    </view>
+    <view class="field" style="border-bottom:none">
+      <text class="label">轮询间隔(秒)</text>
+      <input value="{{intervalInput}}" type="number" bindinput="onIntervalInput" placeholder="2 ~ 300" />
+    </view>
+    <text class="note" style="margin-top:12rpx">
+      板子上报周期为 10 秒。用 WSS 推送时数据一到就刷新；用 HTTP 轮询时建议取 5 秒。
+    </text>
+
+    <!-- 通道选择：两条白名单独立，哪条通就用哪条 -->
+    <text class="label" style="margin-top:16rpx">取数通道</text>
+    <view class="chips">
+      <view wx:for="{{chanOptions}}" wx:key="key"
+            class="chip {{cfg.channel === item.key ? 'chip-on' : ''}}"
+            data-key="{{item.key}}" bindtap="onPickChannel">{{item.label}}</view>
+    </view>
+
+    <!-- 白名单要对上的就是下面这两串，点一下可复制，避免手输错 -->
+    <view class="kv" bindtap="onCopyHost">
+      <text class="kk">① request 合法域名</text>
+      <text class="vv host">{{apiHost}}</text>
+    </view>
+    <view class="kv" bindtap="onCopyWss">
+      <text class="kk">② socket 合法域名</text>
+      <text class="vv host">wss://bemfa.com</text>
+    </view>
+    <view class="kv">
+      <text class="kk">当前小程序 AppID</text>
+      <text class="vv">{{appId}}</text>
+    </view>
+
+    <text class="note warn-note">
+      微信公众平台 →「开发管理 → 开发设置 → 服务器域名」里，request 与 socket 是【两栏】：
+      request 填 ①，socket 填 ②。两栏不能互相顶替。
+      特别注意 ① 是 <text class="mono">apis</text>.bemfa.com（带 s），
+      而巴法云官方小程序教程里写的是 <text class="mono">api</text>.bemfa.com ——
+      少一个 s 就完全对不上；且 api.bemfa.com 上并没有可用的取数接口。
+      域名也必须配在上面这个 AppID 的账号下。
+    </text>
+
+    <view class="btn-row">
+      <view class="btn btn-primary" bindtap="onSaveCfg">保存并重连</view>
+      <view class="btn btn-danger" bindtap="onResetCfg">恢复默认</view>
+    </view>
+    <view class="btn-row">
+      <view class="btn btn-ghost" bindtap="onDiagnose">{{diagRunning ? '诊断中…' : '连接诊断'}}</view>
+    </view>
+  </view>
+
+</view>

@@ -1,0 +1,362 @@
+/* app.wxss —— 全局样式（浅色主题）
+ *
+ * 设计取向：现场巡检用的"仪表盘"，信息密度优先，报警必须一眼看见。
+ *   · 深蓝主色（安全帽/安防调性）+ 白卡片 + 灰底
+ *   · 状态色只用于状态：绿=正常，橙=警告，红=危险
+ */
+
+page {
+  /* ---- 设计变量 ---- */
+  --bg:       #f4f6fa;
+  --card:     #ffffff;
+  --line:     #e6ebf2;
+  --text:     #1b2a3d;
+  --sub:      #7a879b;
+  --primary:  #1f4e79;
+  --primary-2:#2f6ea8;
+  --ok:       #10b981;
+  --warn:     #ef9f0f;
+  --danger:   #e5484d;
+  --info:     #3b82f6;
+
+  background: #f4f6fa;
+  color: #1b2a3d;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.page {
+  padding: 20rpx 24rpx 60rpx;
+}
+
+/* ---------- 报警横幅 ---------- */
+.banner {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 26rpx;
+  border-radius: 18rpx;
+  margin-bottom: 18rpx;
+  color: #fff;
+}
+.banner-danger { background: linear-gradient(135deg, #e5484d, #c02a2f); }
+.banner-warn   { background: linear-gradient(135deg, #ef9f0f, #d1870a); }
+
+.banner-icon {
+  width: 56rpx; height: 56rpx;
+  flex: none;
+  margin-right: 18rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 56rpx;
+}
+.banner-body { flex: 1; min-width: 0; }
+.banner-title { display: block; font-size: 34rpx; font-weight: 700; }
+.banner-sub   { display: block; font-size: 22rpx; opacity: 0.9; margin-top: 4rpx; }
+
+/* ---------- 连接 / 新鲜度条 ---------- */
+.conn {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 22rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--line);
+  margin-bottom: 18rpx;
+}
+.conn-dot {
+  width: 16rpx; height: 16rpx;
+  border-radius: 50%;
+  flex: none;
+  margin-right: 14rpx;
+  background: var(--sub);
+}
+.conn-ok      .conn-dot { background: var(--ok); }
+.conn-warn    .conn-dot { background: var(--warn); }
+.conn-danger  .conn-dot { background: var(--danger); }
+.conn-unknown .conn-dot { background: var(--sub); }
+
+.conn-text { font-weight: 600; }
+.conn-ok     .conn-text { color: var(--ok); }
+.conn-warn   .conn-text { color: var(--warn); }
+.conn-danger .conn-text { color: var(--danger); }
+
+.conn-time {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: var(--sub);
+}
+
+/* ---------- 取数通道标签 ----------
+ * 两条通道（WSS / HTTP）对应微信里【两栏独立】的合法域名。
+ * 把"当前走哪条、什么状态"常驻显示，配错哪一栏能立刻看出来。 */
+.chan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 12rpx 20rpx;
+  background: #fff;
+  border-radius: 14rpx;
+  border: 1rpx solid var(--line);
+  margin: -8rpx 0 18rpx;
+}
+.chan-tag {
+  flex: none;
+  font-size: 20rpx;
+  padding: 3rpx 12rpx;
+  border-radius: 20rpx;
+  margin-right: 12rpx;
+  background: #eef2f8;
+  color: var(--primary);
+  font-family: Consolas, Menlo, monospace;
+}
+.chan-ok     .chan-tag { background: #e7f8f1; color: #0a8f66; }
+.chan-warn   .chan-tag { background: #fdf3e2; color: #a9740c; }
+.chan-danger .chan-tag { background: #fdeaea; color: #b8383c; }
+
+.chan-text { font-size: 23rpx; font-weight: 600; }
+.chan-ok     .chan-text { color: var(--ok); }
+.chan-warn   .chan-text { color: var(--warn); }
+.chan-danger .chan-text { color: var(--danger); }
+
+/* 详情单独占一行，长文本（比如白名单提示）不会被挤压 */
+.chan-detail {
+  flex: 1 1 100%;
+  font-size: 21rpx;
+  color: var(--sub);
+  margin-top: 6rpx;
+  line-height: 1.5;
+}
+
+/* ---------- 通道选择片 ---------- */
+.chips { display: flex; gap: 12rpx; margin: 12rpx 0 6rpx; }
+.chip {
+  flex: 1;
+  text-align: center;
+  font-size: 23rpx;
+  padding: 14rpx 8rpx;
+  border-radius: 12rpx;
+  background: #eef2f8;
+  color: var(--primary);
+}
+.chip-on { background: var(--primary); color: #fff; font-weight: 600; }
+
+/* 独立使用的字段标签（不依赖 .field 容器） */
+.label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--sub);
+}
+
+/* 行内等宽强调：用于 apis / api 这种"差一个字符就是另一个域名"的对比 */
+.mono {
+  font-family: Consolas, Menlo, monospace;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+/* ---------- 错误框 ---------- */
+.errbox {
+  background: #fff5f5;
+  border: 1rpx solid #f6c9cb;
+  border-radius: 16rpx;
+  padding: 22rpx;
+  margin-bottom: 18rpx;
+}
+.err-title { display: block; font-weight: 700; color: var(--danger); margin-bottom: 8rpx; }
+.err-msg   { display: block; font-size: 24rpx; color: #8a3b3e; word-break: break-all; }
+.err-tip   { display: block; font-size: 22rpx; color: var(--sub); margin-top: 10rpx; }
+
+/* 原始 errMsg：等宽 + 稍深底色，和"我的推测"在视觉上分开，一眼能区分证据与建议 */
+.err-raw {
+  display: block;
+  font-size: 22rpx;
+  color: #8a3b3e;
+  background: #fdeaea;
+  border-radius: 8rpx;
+  padding: 10rpx 12rpx;
+  margin-top: 10rpx;
+  word-break: break-all;
+  font-family: Consolas, Menlo, monospace;
+}
+.err-btn { margin-top: 16rpx; }
+
+/* ---------- 连接诊断报告 ---------- */
+.diagbox {
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--line);
+  border-left: 8rpx solid var(--sub);
+  padding: 20rpx 22rpx;
+  margin-bottom: 18rpx;
+}
+.diag-ok     { border-left-color: var(--ok); }
+.diag-warn   { border-left-color: var(--warn); }
+.diag-danger { border-left-color: var(--danger); }
+
+.diag-verdict { display: block; font-weight: 700; font-size: 28rpx; margin-bottom: 10rpx; }
+.diag-ok     .diag-verdict { color: var(--ok); }
+.diag-warn   .diag-verdict { color: var(--warn); }
+.diag-danger .diag-verdict { color: var(--danger); }
+
+.diag-tip {
+  display: block;
+  font-size: 23rpx;
+  color: #8a6412;
+  background: #fffaf0;
+  border-radius: 10rpx;
+  padding: 12rpx 14rpx;
+  margin-top: 12rpx;
+  line-height: 1.6;
+}
+.diag-at {
+  display: block;
+  font-size: 20rpx;
+  color: var(--sub);
+  text-align: right;
+  margin-top: 8rpx;
+}
+
+/* 域名这类"必须一字不差"的值：等宽字体，便于核对 */
+.host {
+  font-family: Consolas, Menlo, monospace;
+  color: var(--primary);
+  font-weight: 600;
+}
+.warn-note {
+  display: block;
+  font-size: 22rpx;
+  color: #8a6412;
+  background: #fffaf0;
+  border-radius: 10rpx;
+  padding: 12rpx 14rpx;
+  margin-top: 14rpx;
+  line-height: 1.6;
+}
+
+/* ---------- 分区标题 ---------- */
+.section-title {
+  font-size: 24rpx;
+  color: var(--sub);
+  margin: 26rpx 4rpx 12rpx;
+  letter-spacing: 2rpx;
+}
+
+/* ---------- 数据卡片 ---------- */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -8rpx;
+}
+.card {
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--card);
+  border-radius: 18rpx;
+  border: 1rpx solid var(--line);
+  padding: 22rpx 24rpx;
+  margin: 8rpx;
+  box-sizing: border-box;
+}
+.card-half { flex: 0 0 calc(50% - 16rpx); }
+.card-full { flex: 0 0 calc(100% - 16rpx); }
+
+.card .k {
+  display: block;
+  font-size: 24rpx;
+  color: var(--sub);
+  margin-bottom: 6rpx;
+}
+.vrow { display: flex; align-items: baseline; }
+.card .v {
+  font-size: 52rpx;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.card .u {
+  font-size: 24rpx;
+  color: var(--sub);
+  margin-left: 8rpx;
+}
+.card .note {
+  display: block;
+  font-size: 22rpx;
+  color: var(--sub);
+  margin-top: 6rpx;
+}
+
+.v-ok     { color: var(--ok)     !important; }
+.v-warn   { color: var(--warn)   !important; }
+.v-danger { color: var(--danger) !important; }
+.v-mute   { color: #b3bccb       !important; }
+
+/* ---------- 键值行 ---------- */
+.kv {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--line);
+  font-size: 26rpx;
+}
+.kv:last-child { border-bottom: none; }
+.kv .kk { color: var(--sub); flex: none; width: 220rpx; }
+.kv .vv { flex: 1; text-align: right; word-break: break-all; }
+
+/* ---------- 提示列表 ---------- */
+.tips {
+  background: #fffaf0;
+  border: 1rpx solid #f7e2b8;
+  border-radius: 16rpx;
+  padding: 18rpx 22rpx;
+}
+.tips .tip {
+  display: block;
+  font-size: 24rpx;
+  color: #8a6412;
+  padding: 6rpx 0;
+}
+.tips .tip::before { content: "· "; font-weight: 700; }
+
+/* ---------- 表单 ---------- */
+.field {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.field .label { width: 200rpx; flex: none; color: var(--sub); font-size: 26rpx; }
+.field input {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text);
+  background: #f7f9fc;
+  border-radius: 10rpx;
+  padding: 14rpx 16rpx;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: inline-block;
+  padding: 16rpx 34rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  text-align: center;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-ghost   { background: #eef2f8; color: var(--primary); }
+.btn-danger  { background: #fdecec; color: var(--danger); }
+/* 次级主动作：比 btn-ghost 重要、比 btn-primary 轻。
+   用在「仅存本机（只让小程序告警）」这类"不做设备交互但也算保存"的动作上。 */
+.btn-secondary { background: #e6f4ea; color: #1e7a3c; }
+.btn-sm { padding: 12rpx 26rpx; font-size: 24rpx; }
+
+.btn-row {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+.btn-row .btn { flex: 1; }

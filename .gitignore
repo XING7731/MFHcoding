@@ -1,0 +1,96 @@
+# ===========================================================================
+# MFHcoding / .gitignore
+# 目的：只排除【可再生的编译产物】与【本机私有配置】，
+#      凡是"别人 clone 下来要能直接打开、直接编译"所需的东西一律保留。
+# ===========================================================================
+
+# ---------- Keil MDK ----------
+# MDK-ARM/<工程名>/ 就是 obj/axf/listing 的输出目录
+MDK-ARM/**/Objects/
+MDK-ARM/**/Listings/
+MDK-ARM/**/DebugConfig/
+*.o
+*.d
+*.crf
+*.dep
+*.lnp
+*.axf
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.htm
+*.build_log.htm
+# .uvprojx / .uvoptx 是工程本体，必须提交；.uvguix.* 只是本机窗口布局
+*.uvguix.*
+# 保留 RTE/（RTE_Components.h 参与编译）
+
+# ---------- IAR ----------
+**/Debug/Exe/
+**/Debug/List/
+**/Debug/Obj/
+**/Release/Exe/
+**/Release/List/
+**/Release/Obj/
+*.ewt.bak
+*.dep
+
+# ---------- Qt ----------
+build-*/
+*.pro.user
+*.pro.user.*
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.o
+*.obj
+Makefile.Debug
+Makefile.Release
+debug/
+release/
+
+# ---------- 微信小程序 ----------
+# ★ 不要把 dist/ 写进来！
+#   smart-hotel 的 app.json 里写的是 "van-button": "/dist/button/index"，
+#   那个 dist/ 是它【自带并需要提交】的 vant-weapp 组件库
+#   （该工程没有 node_modules、也没有 package.json）。
+#   误删的后果是"组件一个都渲染不出来"，而且本地看不出报错。
+node_modules/
+miniprogram_npm/
+project.private.config.json
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# ---------- 编辑器 / 系统 ----------
+.vscode/
+.idea/
+.settings/
+.metadata/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 临时探针 / 归档 ----------
+# ★ `_` 开头 = 临时探针，是【智能头盔那个工程自己的约定】，不是全局约定。
+#   第一版写成了全局 `_*`，结果误伤了两处必需内容：
+#     · MDK-ARM/RTE/_smart-helmet-freertos/RTE_Components.h（Keil 的 RTE 配置）
+#     · wechat-miniprogram/smart-hotel/_tools/（该小程序自己的 4 个校验脚本）
+#   ⇒ 忽略规则必须【限定到具体工程】，一个工程的命名约定不能推广到全仓库。
+embedded/smart-helmet-freertos/_*
+embedded/smart-helmet-freertos/tools/_*
+
+*.7z
+*.rar
+*.zip
+~$*
+
+# ---------- 日志 ----------
+*.log

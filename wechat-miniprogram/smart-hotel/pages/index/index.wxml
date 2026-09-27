@@ -1,0 +1,211 @@
+<!--pages/index/index.wxml  「未来酒店·智慧监控」主页面-->
+<view class="page">
+
+  <!-- ========== 房间切换（多房间时显示） ========== -->
+  <view class="room-tabs" wx:if="{{rooms.length > 1}}">
+    <van-tabs
+      active="{{activeRoomIndex}}"
+      bind:change="onRoomTabChange"
+      color="#1976d2"
+      title-active-color="#1976d2"
+      title-inactive-color="#5b6673"
+      line-width="48"
+      line-height="3"
+      animated="{{false}}"
+    >
+      <van-tab wx:for="{{rooms}}" wx:key="id" title="{{item.name}}" />
+    </van-tabs>
+  </view>
+
+  <!-- ========== 告警提示条 ========== -->
+  <view class="alarm-bar" wx:if="{{alarmText}}">
+    <van-notice-bar
+      left-icon="/utils/img/wran.png"
+      color="#e54545"
+      background="#fdecec"
+      text="{{alarmText}}"
+      scrollable
+    />
+  </view>
+
+  <!-- ========== 实时环境 ========== -->
+  <view class="card">
+    <view class="card-head">
+      <view class="card-title">实时环境</view>
+      <text class="pill {{deviceOnline ? 'pill--on' : 'pill--off'}}">
+        {{deviceOnline ? '设备在线' : '设备离线'}}
+      </text>
+    </view>
+
+    <view class="metric-grid">
+      <view class="metric">
+        <image class="metric__icon" src="/utils/img/shidu.png" mode="aspectFit"></image>
+        <text class="metric__label">湿度</text>
+        <view class="metric__value">
+          <text class="metric__number">{{shidu}}</text>
+          <text class="metric__unit">%</text>
+        </view>
+      </view>
+      <view class="metric">
+        <image class="metric__icon" src="/utils/img/wendu.png" mode="aspectFit"></image>
+        <text class="metric__label">温度</text>
+        <view class="metric__value">
+          <text class="metric__number">{{wendu}}</text>
+          <text class="metric__unit">℃</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="metric-foot">
+      <view class="metric-foot__item">
+        <text class="metric-foot__label">烟雾值</text>
+        <text class="metric-foot__value">{{smoke}}</text>
+      </view>
+      <view class="metric-foot__item">
+        <text class="metric-foot__label">上传时间</text>
+        <text class="metric-foot__value">{{dataTime || '--'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 舒适度设定 ========== -->
+  <view class="card">
+    <view class="card-title mb-24">舒适度设定</view>
+    <view class="setting-row">
+      <view class="setting-row__label">
+        <image class="setting-row__icon" src="/utils/img/shidu.png" mode="aspectFit"></image>
+        <text>设定湿度</text>
+      </view>
+      <van-stepper
+        value="{{setHumi}}"
+        min="{{0}}"
+        max="{{100}}"
+        async-change
+        bind:change="onHumiChange"
+      />
+    </view>
+    <view class="setting-row">
+      <view class="setting-row__label">
+        <image class="setting-row__icon" src="/utils/img/wendu.png" mode="aspectFit"></image>
+        <text>设定温度</text>
+      </view>
+      <van-stepper
+        value="{{setTemp}}"
+        min="{{16}}"
+        max="{{32}}"
+        async-change
+        bind:change="onTempChange"
+      />
+    </view>
+  </view>
+
+  <!-- ========== 加湿器控制 ========== -->
+  <view class="card">
+    <view class="card-head">
+      <view class="card-title">加湿器控制</view>
+      <text class="pill {{humiStatus ? 'pill--on' : 'pill--off'}}">
+        {{humiStatus ? '运行中' : '已关闭'}}
+      </text>
+    </view>
+
+    <view class="humi-stage">
+      <image class="humi-stage__image" src="{{humiIcon}}" mode="aspectFit"></image>
+      <text class="humi-stage__tip">
+        {{currentMode === 2 ? '自动模式：湿度低于设定值自动开启' : '手动模式：由你手动开关'}}
+      </text>
+    </view>
+
+    <view class="mode-row">
+      <button
+        class="mode-btn {{currentMode === 1 ? 'is-active' : ''}}"
+        bindtap="setScene"
+        data-scene="manual"
+      >
+        <image class="mode-btn__icon" src="/utils/img/manual.png" mode="aspectFit"></image>
+        <text>手动模式</text>
+      </button>
+      <button
+        class="mode-btn {{currentMode === 2 ? 'is-active' : ''}}"
+        bindtap="setScene"
+        data-scene="auto"
+      >
+        <image class="mode-btn__icon" src="/utils/img/auto.png" mode="aspectFit"></image>
+        <text>自动模式</text>
+      </button>
+    </view>
+
+    <button
+      class="power-btn {{humiStatus ? 'power-btn--off' : 'power-btn--on'}} {{btnDisabled ? 'is-disabled' : ''}}"
+      bindtap="onPowerTap"
+      disabled="{{btnDisabled}}"
+    >
+      {{humiStatus ? '关闭加湿器' : '开启加湿器'}}
+    </button>
+    <view class="humi-tip" wx:if="{{btnDisabled}}">自动模式下加湿器由云端策略自动控制</view>
+  </view>
+
+  <!-- ========== 灯光控制 ========== -->
+  <view class="card">
+    <view class="card-head">
+      <view class="card-title">灯光控制</view>
+      <text class="text-muted">一路灯带：红 / 黄互斥</text>
+    </view>
+
+    <view class="light-grid">
+      <view class="light-item {{yellowChecked ? 'is-on' : ''}}">
+        <image class="light-item__lamp" src="{{ledYellowIcon}}" mode="aspectFit"></image>
+        <view class="light-item__row">
+          <image class="light-item__mini" src="{{yellowIcon}}" mode="aspectFit"></image>
+          <text class="light-item__name">黄灯</text>
+          <van-switch
+            checked="{{yellowChecked}}"
+            size="24px"
+            bind:change="onYellowChange"
+          />
+        </view>
+      </view>
+
+      <view class="light-item {{redChecked ? 'is-on' : ''}}">
+        <image class="light-item__lamp" src="{{ledRedIcon}}" mode="aspectFit"></image>
+        <view class="light-item__row">
+          <image class="light-item__mini" src="{{redIcon}}" mode="aspectFit"></image>
+          <text class="light-item__name">红灯</text>
+          <van-switch
+            checked="{{redChecked}}"
+            size="24px"
+            bind:change="onRedChange"
+          />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 温湿度曲线 ========== -->
+  <view class="card">
+    <view class="card-head">
+      <view class="card-title">温湿度曲线分布</view>
+      <text class="text-muted">最近 {{trendX.length}} 个采样点</text>
+    </view>
+    <trend-chart
+      x-axis="{{trendX}}"
+      series="{{trendSeries}}"
+      height="{{240}}"
+      empty-text="等待设备上报温湿度数据…"
+      smooth
+    />
+  </view>
+
+  <!-- ========== 底部入口 ========== -->
+  <view class="footer-actions">
+    <view class="footer-actions__item" bindtap="goRooms">
+      <text class="footer-actions__title">房间总览</text>
+      <text class="footer-actions__desc">共 {{rooms.length}} 个房间</text>
+    </view>
+    <view class="footer-actions__item" bindtap="goSetting">
+      <text class="footer-actions__title">参数设置</text>
+      <text class="footer-actions__desc">云端 · 阈值 · 房间</text>
+    </view>
+  </view>
+
+  <view class="page-bottom-space"></view>
+</view>

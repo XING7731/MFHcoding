@@ -1,0 +1,82 @@
+<!--pages/rooms/rooms.wxml  多房间总览-->
+<view class="page">
+
+  <!-- 汇总 -->
+  <view class="summary">
+    <view class="summary__item">
+      <text class="summary__value">{{rooms.length}}</text>
+      <text class="summary__label">房间总数</text>
+    </view>
+    <view class="summary__item">
+      <text class="summary__value summary__value--on">{{onlineCount}}</text>
+      <text class="summary__label">设备在线</text>
+    </view>
+    <view class="summary__item">
+      <text class="summary__value summary__value--warn">{{warnCount}}</text>
+      <text class="summary__label">告警房间</text>
+    </view>
+  </view>
+
+  <!-- 房间卡片 -->
+  <view
+    class="room-card {{item.id === activeRoomId ? 'room-card--active' : ''}}"
+    wx:for="{{cards}}"
+    wx:key="id"
+    data-index="{{index}}"
+    bindtap="onSelectRoom"
+  >
+    <view class="room-card__head">
+      <view class="room-card__title">
+        <text class="room-card__name">{{item.name}}</text>
+        <text class="room-card__topic">{{item.infoTopic}} / {{item.ctrlTopic}}</text>
+      </view>
+      <text class="pill {{item.online ? 'pill--on' : 'pill--off'}}">
+        {{item.online ? '在线' : '离线'}}
+      </text>
+    </view>
+
+    <view class="room-card__values">
+      <view class="room-card__value">
+        <view class="room-card__number">
+          <text>{{item.temp}}</text>
+          <text class="room-card__unit">℃</text>
+        </view>
+        <text class="room-card__label">温度</text>
+      </view>
+      <view class="room-card__value">
+        <view class="room-card__number">
+          <text>{{item.humi}}</text>
+          <text class="room-card__unit">%</text>
+        </view>
+        <text class="room-card__label">湿度</text>
+      </view>
+      <view class="room-card__value">
+        <view class="room-card__number">
+          <text>{{item.smoke}}</text>
+        </view>
+        <text class="room-card__label">烟雾值</text>
+      </view>
+    </view>
+
+    <view class="room-card__warn" wx:if="{{item.warnText}}">{{item.warnText}}</view>
+
+    <view class="room-card__foot">
+      <text class="text-muted">
+        加湿器 {{item.humiOn ? '运行中' : '已关闭'}}
+      </text>
+      <text class="text-muted">{{item.time ? '更新于 ' + item.time : '暂无上报数据'}}</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!cards.length}}">
+    <text>还没有房间，请先到「参数设置」中添加</text>
+  </view>
+
+  <view class="action-row">
+    <van-button type="primary" block round bind:click="goSetting">
+      管理房间与云端配置
+    </van-button>
+  </view>
+
+  <view class="page-bottom-space"></view>
+</view>

@@ -1,0 +1,13 @@
+/* pages/index/index.wxss —— 实时监测页
+ * 大部分样式来自 app.wxss，这里只放本页特有的微调。
+ */
+
+.page {
+  padding-bottom: 80rpx;
+}
+
+/* 三轴读数那一行需要等宽数字，避免数字跳动时整行抖动 */
+.vrow .v,
+.kv .vv {
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,40 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/background.jpg</file>
+        <file>image/camera.png</file>
+        <file>image/face.png</file>
+        <file>image/set.png</file>
+        <file>image/trash.png</file>
+        <file>image/data.png</file>
+        <file>image/back.png</file>
+        <file>image/2.jpg</file>
+        <file>image/welcome.gif</file>
+        <file>image/4.png</file>
+        <file>image/1.png</file>
+        <file>image/5.png</file>
+        <file>image/blue.png</file>
+        <file>image/cloudy.png</file>
+        <file>image/deafault.png</file>
+        <file>image/green.png</file>
+        <file>image/humic.png</file>
+        <file>image/humio.png</file>
+        <file>image/null.png</file>
+        <file>image/overcast.png</file>
+        <file>image/rain.png</file>
+        <file>image/red.png</file>
+        <file>image/sensor.png</file>
+        <file>image/snow.png</file>
+        <file>image/sunny.png</file>
+        <file>image/weather.png</file>
+        <file>image/yellow.png</file>
+        <file>image/wendu.png</file>
+        <file>image/smoke.png</file>
+        <file>image/shidu.png</file>
+        <file>image/peopleon.png</file>
+        <file>image/people.png</file>
+        <file>image/light.png</file>
+        <file>image/off.png</file>
+        <file>image/on.png</file>
+        <file>image/smoke2.png</file>
+    </qresource>
+</RCC>

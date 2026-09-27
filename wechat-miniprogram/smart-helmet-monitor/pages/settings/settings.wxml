@@ -1,0 +1,189 @@
+<!-- pages/settings/settings.wxml —— 阈值设置（改门限 → 存本机 / 下发设备 → 回读确认） -->
+<view class="page">
+
+  <!-- ============ 有未落本的改动 ============
+       【为什么必须显眼】滑块改的只是界面上的值。本机那一份（实时监测页判读用的）
+       要等按钮点下才更新。没有这条提示时，用户拖完滑块回实时页发现"不告警"，
+       会以为判据坏了 —— 实际上只是没保存。 -->
+  <view wx:if="{{dirty}}" class="errbox" style="margin-bottom:16rpx">
+    <text class="err-title">门限还没保存</text>
+    <text class="err-msg">你在上面改动的值目前只在这个界面上。实时监测页的阈值预警读的是【本机保存】的那一份 —— 不点下面任一按钮，它不会告警。</text>
+  </view>
+
+  <!-- ============ 当前读数 ============ -->
+  <view class="cura">
+    <view class="cura-l">
+      <text class="cura-t">当前读数</text>
+      <text class="cura-s">{{curLoading ? '获取中…' : ('更新于 ' + curAt)}}</text>
+    </view>
+    <view class="btn btn-ghost btn-sm" bindtap="onRefreshCur">刷新</view>
+  </view>
+  <text wx:if="{{curErr}}" class="err-msg">{{curErr}}</text>
+
+  <!-- ============ 指纹核对 ============ -->
+  <view class="cvbox cv-{{cv.level}}">
+    <text class="cv-title">设备是否已按这套门限工作</text>
+    <text class="cv-text">{{cv.text}}</text>
+    <view class="kv">
+      <text class="kk">本机门限指纹</text>
+      <text class="vv mono-cv">{{cvLocal}}</text>
+    </view>
+    <view class="kv">
+      <text class="kk">设备上报指纹</text>
+      <text class="vv mono-cv">{{cvDev === null ? '（未收到）' : cvDev}}</text>
+    </view>
+    <text class="note">
+      指纹由 8 个门限值按固定顺序算出。两个数相等 = 设备收下并生效了；
+      不等 = 还没收到、或被整条拒绝、或设备刚重启回到出厂默认。
+      设备把这些门限存在 RAM 里（不写 Flash：擦页会停总线 20~40ms，
+      而 5ms 周期的撞击监视任务不能被拖住），所以每次上电要重新下发一次。
+    </text>
+  </view>
+
+  <!-- ============ 各组门限 ============ -->
+  <block wx:for="{{groups}}" wx:key="key" wx:for-item="g">
+    <view class="section-title">
+      {{g.title}}门限
+      <text class="cur-inline">当前 {{g.curText}}</text>
+    </view>
+    <view class="card card-full">
+      <text class="note" wx:if="{{g.note}}">{{g.note}}</text>
+
+      <view class="trow" wx:for="{{g.items}}" wx:key="k" wx:for-item="it">
+        <view class="trow-head">
+          <view class="trow-name">
+            <text class="tn">{{it.name}}</text>
+            <text class="th">{{it.hint}}</text>
+          </view>
+          <view class="trow-val">{{it.text}}</view>
+        </view>
+
+        <view class="trow-ctl">
+          <view class="stp" data-k="{{it.k}}" data-delta="-1" bindtap="onStep">−</view>
+          <slider class="sld"
+                  min="{{it.min}}" max="{{it.max}}" step="{{it.step}}"
+                  value="{{it.val}}"
+                  activeColor="#1f4e79" backgroundColor="#e6ebf2"
+                  data-k="{{it.k}}" bindchange="onSlide" />
+          <view class="stp" data-k="{{it.k}}" data-delta="1" bindtap="onStep">＋</view>
+        </view>
+
+        <view class="trow-foot">
+          <text class="lim">量程 {{it.min}} ~ {{it.max}}</text>
+          <text class="usecur" data-k="{{it.k}}" bindtap="onUseCur">按当前读数填</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ============ 蜂鸣器 ============
+       【这个开关只管道板子】小程序的阈值预警读本机门限，与 buz 无关。
+       所以"我只想要小程序告警"= 关掉这个开关 + 用下面的「仅存本机」。 -->
+  <view class="section-title">板子蜂鸣器</view>
+  <view class="card card-full">
+    <view class="swrow">
+      <view class="trow-name">
+        <text class="tn">越限蜂鸣</text>
+        <text class="th">关闭后，板子不再为温湿度 / 心率 / 血氧 / 气体越限发声</text>
+      </view>
+      <switch checked="{{T.buz === 1}}" bindchange="onBuzChange" color="#1f4e79" />
+    </view>
+    <text class="note warn-note">
+      这个开关【只管板子的蜂鸣器】，管不到小程序的告警 —— 小程序的阈值预警读的是
+      你在本页保存的门限，不受这里影响。所以"只想让小程序告警"要两件事一起做：
+      关掉这个开关 + 用下面的「仅存本机」。
+    </text>
+    <text class="note warn-note">
+      它也【管不到】摔倒报警、SOS 求助和网络失败提示 —— 那几项是安全功能和
+      状态提示，被静音会让设备"看起来正常"。所以它们始终会响。
+    </text>
+  </view>
+
+  <!-- ============ 迟滞 ============ -->
+  <view class="section-title">迟滞（防止在门限附近反复响）</view>
+  <view class="card card-full">
+    <text class="note">
+      传感器读数在门限附近必然抖动。固件的做法是：越过门限就置位报警，
+      要回落到「门限 − 迟滞」才解除。迟滞只影响"什么时候停"，不影响"什么时候开始"。
+    </text>
+    <view class="kv">
+      <text class="kk">各量迟滞</text>
+      <text class="vv">{{hystNote}}</text>
+    </view>
+  </view>
+
+  <!-- ============ 保存 / 下发 ============
+       两个按钮表达两件不同的事：
+         · 「仅本机生效」= 只让小程序告警，不碰设备（用户只想要小程序告警时走这条）
+         · 「保存并下发设备」= 落本机 + 推到设备，让蜂鸣器也按新门限工作 -->
+  <view class="section-title">保存 / 下发</view>
+  <view class="card card-full">
+
+    <text class="label">下发主题（点一下可复制）</text>
+    <view class="kv" bindtap="onCopyTopic">
+      <text class="kk">topic</text>
+      <text class="vv host">{{cmdTopicText}}</text>
+    </view>
+
+    <text class="label" style="margin-top:16rpx">报文预览（{{cmdBytes}} 字节，点一下可复制）</text>
+    <view class="msgbox" bindtap="onCopyMsg">{{cmdMsg}}</view>
+
+    <text class="label" style="margin-top:16rpx">量程（越界会被设备整条拒绝）</text>
+    <view class="rgrid">
+      <view class="rchip" wx:for="{{ranges}}" wx:key="k">
+        <text class="rk">{{item.k}}</text>
+        <text class="rv">{{item.range}}</text>
+        <text class="rx">{{item.x10 ? '×10' : '整数'}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{problems.length > 0}}" class="errbox" style="margin-top:16rpx">
+      <text class="err-title">这组门限不能保存</text>
+      <text class="err-msg" wx:for="{{problems}}" wx:key="*this">· {{item}}</text>
+    </view>
+
+    <view class="btn-row">
+      <view class="btn btn-primary {{problems.length > 0 ? 'btn-off' : ''}}"
+            bindtap="onSend">{{sending ? '下发中…' : '保存并下发设备'}}</view>
+      <view class="btn btn-ghost" bindtap="onReset">恢复默认值</view>
+    </view>
+
+    <!-- 只让小程序告警：存本机、不推设备。刻意放在第二行、用次级样式 ——
+         它比"下发设备"轻，但比"恢复默认值"重要。 -->
+    <view class="btn-row">
+      <view class="btn btn-secondary {{problems.length > 0 ? 'btn-off' : ''}}"
+            bindtap="onSaveLocal">仅存本机（只让小程序告警）</view>
+    </view>
+    <text class="note">
+      「仅存本机」只更新【实时监测页的阈值预警】判读依据，不向设备推送 ——
+      板子的蜂鸣器仍按它自己那份门限工作。想让板子完全不响，把上面的
+      「越限蜂鸣」关掉即可（它只管数值越限，管不到摔倒 / SOS / 网络失败）。
+    </text>
+
+    <view wx:if="{{lastLocal}}" class="sendres sendres-ok">
+      <text class="sr-t">✓ 已存到本机 · {{lastLocal.at}}</text>
+      <text class="sr-s">{{lastLocal.text}}</text>
+    </view>
+
+    <view wx:if="{{lastSend}}" class="sendres sendres-{{lastSend.ok ? 'ok' : 'bad'}}">
+      <text class="sr-t">{{lastSend.ok ? '✓ 推送成功' : '! 推送失败'}} · {{lastSend.at}}</text>
+      <text class="sr-s">{{lastSend.text}}</text>
+    </view>
+
+    <text class="note warn-note">
+      发到「主题/set」而不是裸主题：平台会把 <text class="mono">/set</text> 下的消息
+      推给所有订阅了该主题的设备，而设备订阅的正是裸主题 —— 所以不用改任何固件配置。
+      若直发裸主题，会把设备的上报记录顶掉，实时页立刻变成过期数据。
+    </text>
+
+    <text class="note">
+      想要"现在就让蜂鸣器响"来验证：把某一项门限设到【比当前读数更靠近报警方向】即可。
+      比如当前 26.4℃，把高温门限填成 25℃ → 下一帧起设备就报警。验证完记得改回去。
+    </text>
+  </view>
+
+  <view class="btn-row">
+    <view class="btn btn-ghost" bindtap="onBack">回到实时监测</view>
+  </view>
+
+</view>

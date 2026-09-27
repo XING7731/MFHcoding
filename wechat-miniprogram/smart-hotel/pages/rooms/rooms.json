@@ -1,0 +1,6 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "房间总览",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

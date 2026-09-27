@@ -1,0 +1,201 @@
+
+1. bemfa.js 的 THRESH 与固件门限逐项核对
+------------------------------
+  ok   THRESH.gas === GAS_ALARM_LEVEL  (50 vs 50)
+  ok   THRESH.tempHigh === TEMP_HIGH_X10 / 10  (40 vs 40)
+  ok   THRESH.tempLow === TEMP_LOW_X10 / 10  (10 vs 10)
+  ok   THRESH.humiHigh === HUMI_HIGH_X10 / 10  (90 vs 90)
+  ok   THRESH.humiLow === HUMI_LOW_X10 / 10  (20 vs 20)
+  ok   THRESH.hrMin === HR_MIN_BPM  (50 vs 50)
+  ok   THRESH.hrMax === HR_MAX_BPM  (120 vs 120)
+  ok   THRESH.spo2Min === SPO2_MIN_PERCENT  (90 vs 90)
+  ok   THRESH.accelHigh === FALL_ACCEL_HIGH_G  (1.8 vs 1.8)
+  ok   固件里已不存在光照宏 LIGHT_CAL_ENABLED（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_DARK_LUX（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_BRIGHT_LUX（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_DARK_RAW（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_BRIGHT_RAW（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_CAL_RAW_1（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_CAL_LUX_1（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_CAL_RAW_2（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 LIGHT_CAL_LUX_2（docs/39 的删除必须彻底）
+  ok   固件里已不存在光照宏 HW_FILL_LIGHT_PRESENT（docs/39 的删除必须彻底）
+  ok   bemfa.THRESH 里已无 luxLow / luxHigh
+
+2. 出厂默认值与量程（T_DEF / T_LIMIT）与固件一致
+---------------------------------
+  ok   T_DEF.tHi === TEMP_HIGH_X10  (40 vs 40)
+  ok   T_DEF.tLo === TEMP_LOW_X10  (10 vs 10)
+  ok   T_DEF.hHi === HUMI_HIGH_X10  (90 vs 90)
+  ok   T_DEF.hLo === HUMI_LOW_X10  (20 vs 20)
+  ok   T_DEF.gas === GAS_ALARM_LEVEL  (50 vs 50)
+  ok   T_DEF.hrLo === HR_MIN_BPM  (50 vs 50)
+  ok   T_DEF.hrHi === HR_MAX_BPM  (120 vs 120)
+  ok   T_DEF.sp === SPO2_MIN_PERCENT  (90 vs 90)
+  ok   T_DEF.buz === 1 对应固件 AlarmCfg_Init 里的 buz_enable = 1
+  ok   T_DEF.buz === 1
+  ok   T_LIMIT.tHi === [-20, 60]  (-20, 60)
+  ok   T_LIMIT.tLo === [-20, 60]  (-20, 60)
+  ok   T_LIMIT.hHi === [0, 100]  (0, 100)
+  ok   T_LIMIT.hLo === [0, 100]  (0, 100)
+  ok   T_LIMIT.gas === [1, 100]  (1, 100)
+  ok   T_LIMIT.hrLo === [20, 200]  (20, 200)
+  ok   T_LIMIT.hrHi === [20, 200]  (20, 200)
+  ok   T_LIMIT.sp === [50, 100]  (50, 100)
+  ok   T_LIMIT.buz === [0,1]，与固件"只拒 >1"一致
+  ok   alarm_cfg.h 声明的指纹顺序仍是 tHi,tLo,hHi,hLo,gas,hrLo,hrHi,sp,buz
+  ok   T_FIELDS 的顺序与固件 CFG_HASH_ORDER_DOC 一致
+  ok   只有温湿度是 ×10 定点，其余按整数下发
+
+3. 指纹 cv 与 alarm_cfg_vectors.txt 逐条对照
+-------------------------------------
+  ok   读到 4 条对照向量
+  ok   cv[default] = 38972
+  ok   cv[demo-temp-low] = 48791
+  ok   cv[all-changed] = 19795
+  ok   cv[zeros-edges] = 10012
+  ok   出厂默认门限的指纹 = 38972 (0x983C)
+  ok   alarm_cfg.h 注释里写的也是 38972(0x983C)
+  ok   每个字段单独动一个最小单位，指纹都会变（无碰撞字段）
+
+4. buildConfigMsg 与 alarm_cfg_msgs.txt 逐字节对照
+--------------------------------------------
+  ok   报文条数与向量条数一致
+  ok   报文[default] 逐字节相同
+  ok   报文[demo-temp-low] 逐字节相同
+  ok   报文[all-changed] 逐字节相同
+  ok   报文[zeros-edges] 逐字节相同
+  ok   所有对照报文逐字节一致
+  ok   典型下发报文 98 字节 < 191
+  ok   报文含 "cfg":1 标记（设备靠它认领这条报文）
+  ok   报文含 "m":7（小程序侧序号，与设备的 seq 错开）
+  ok   报文里【没有】seq 字段（不能用它，会污染设备的回环送达判据）
+  ok   报文里 9 个字段全部等于按量纲换算后的值
+  ok   报文里没有两位小数（固件的定点解析只认一位）
+
+5. validateThresh 与固件 cfg_validate 同边界
+--------------------------------------
+  ok   出厂默认门限本身可以通过校验
+  ok   16 组量程边界：边界值通过、越界一格被拒
+  ok   拒绝 tLo >= tHi
+  ok   拒绝 tLo > tHi
+  ok   拒绝 hLo >= hHi
+  ok   拒绝 hLo > hHi
+  ok   拒绝 hrLo >= hrHi
+  ok   拒绝 hrLo > hrHi
+  ok   越界报告里点名到具体字段（用户才知道改哪一项）
+========================================================================
+阈值在线配置 / 小程序侧 静态验证
+========================================================================
+
+7. 阈值设置页（pages/settings）驱动验证
+----------------------------
+  ok   设置页覆盖了下发报文的全部 9 个字段（滑块 8 个 + 蜂鸣开关 1 个），且没有多余的
+  ok   滑块行共 8 个（温湿度各 2 + 心率 2 + 血氧 1 + 气体 1）
+  ok   分成 5 组（温度/湿度/心率/血氧/气体）
+  ok   初始报文 = 出厂默认的报文
+  ok   初始状态没有校验问题
+  ok   下发主题以 /set 结尾（不能直发裸主题，否则顶掉上报记录）
+  ok   取到当前温度 26.4
+  ok   回读到设备指纹 38972
+  ok   设备指纹与本机一致 → 判为"已生效"
+  ok   拖滑块把 tHi 改成 25
+  ok   报文里出现 "tHi":25
+  ok   改了门限之后指纹对不上 → 判为"未同步"（这正是它该干的事）
+  ok   tHi 已在上限 60，再加一次仍停在 60（不会造出必被拒的值）
+  ok   tLo 已在下限 -20，再减一次仍停在 -20
+  ok   温度按 0.5 步进（不是 1）
+  ok   当前 26.4℃ → 高温门限填成 26.5（对齐到 0.5 步进）
+  ok   开关关掉 → buz=0
+  ok   报文里出现 "buz":0
+  ok   开关打开 → buz=1
+  ok   低温 50 > 高温 30 → 界面立刻标出问题
+  ok   有问题时点下发【不发出任何请求】（否则用户只会看到"点了没反应"）
+  ok   弹出模态说明为什么不能下发
+  ok   非法组合不会污染本机保存的门限
+  ok   下发改动只发出 1 条请求
+  ok   请求打到 /va/sendMessage（与取数同一主机，不需要第二条白名单）
+  ok   topic = temp001/set
+  ok   msg 与界面预览的一致
+  ok   uid 与 type=1 都带上了
+  ok   下发报文 90 字节 < 191
+  ok   推送成功后本机保存了这组门限（本机那份 = "希望设备生效的门限"）
+  ok   界面报告推送成功
+  ok   推送失败时本机门限【不变】—— 否则本机判读会永久性地与设备不一致
+  ok   界面如实报告推送失败
+  ok   失败原因里带上原始 errMsg（一手证据，不被推测覆盖）
+  ok   指纹相等 → ok
+  ok   指纹不等 → warn
+  ok   设备没报指纹（老固件）→ info
+  ok   老固件时明说"无法回读"，不谎报成未同步
+  ok   恢复默认把界面填回出厂值
+  ok   恢复默认【只改界面】，本机已保存的那份要等重新下发才变（避免本机说一套、设备做一套）
+  ok   恢复默认后报文预览变回出厂默认的报文
+
+8. 实时页与趋势页跟随【本机保存的门限】
+---------------------
+  ok   默认 40℃ 高温门限下，26.4℃ 判为正常
+  ok   默认门限下没有预警项
+  ok   设备指纹与本机一致 → 显示已生效
+  ok   高温门限改成 25 后，26.4℃ 立刻判为危险（界面跟着本机门限走）
+  ok   预警列表里出现温度项
+  ok   提示文案里写的是新门限 25，不是写死的 40
+  ok   设备与本机指纹不同 → 两个值都如实报出来（48791 / 38972）
+  ok   两种可能都说清楚：可能是有意的「仅存本机」，也可能真要下发（不再武断让人重发）
+  ok   不再出现「未同步」这种武断措辞（会把"只让小程序告警"的正常用法误报成故障）
+  ok   高湿门限 50、实际 58 → 判为警告
+  ok   湿度提示里带上门限值
+  ok   心率 130 超出 70~90 → 警告
+  ok   气体 21 超过门限 10 → 危险
+  ok   预警列表同时包含心率与气体
+  ok   这一帧的读数确实取到了合加速度 3.0g
+  ok   合加速度 3.0g > 常量门限 1.8g → 剧烈撞击（不是 2.5，也不是 99）
+  ok   本机保存的那份里【不含】accelHigh（这一项刻意不在下发范围内）
+  ok   本机保存的那份里也不再有任何 lux 门限（docs/39 已整条删除）
+  ok   温度视图的阈值线来自本机门限 (15 / 28)
+  ok   气体视图的阈值线 42
+  ok   心率视图的阈值线 45 / 100
+  ok   湿度视图现在也有阈值线了（此前没有）
+  ok   温湿度双轴视图不画阈值线
+  ok   撞击阈值线取 THRESH.accelHigh = 1.8
+
+9. 页面注册与 tabBar
+--------------------
+  ok   app.json 的 pages 里注册了 pages/settings/settings
+  ok   tabBar 第三项指向阈值设置页
+  ok   settings.js 存在
+  ok   settings.wxml 存在
+  ok   settings.wxss 存在
+  ok   settings.json 存在
+  ok   实时页上有进入阈值设置页的按钮
+  ok   实时页上有阈值预警横幅
+  ok   实时页的预警列表渲染 item.text（不是裸 item）
+  ok   设置页上的蜂鸣开关绑定了 onBuzChange
+  ok   滑块与加减按钮都绑定了处理函数
+  ok   设置页有 onSend 的入口
+  ok   设置页有 onReset 的入口
+  ok   设置页有 onUseCur 的入口
+  ok   设置页有 onRefreshCur 的入口
+  ok   设置页有 onCopyMsg 的入口
+  ok   设置页有 onCopyTopic 的入口
+
+10. 仅存本机（只让小程序告警，不下发设备）
+-----------------------
+  ok   拖滑块后界面门限变成 25
+  ok   拖滑块【不】落本机（避免"改了一半"被当成已生效）
+  ok   界面立刻标出"门限还没保存"（这就是"调了阈值却不告警"的现场）
+  ok   「仅存本机」【一条请求都不发】—— 绝不碰设备
+  ok   本机已保存新门限 25（实时页会按它判读）
+  ok   保存后 dirty 灭掉
+  ok   给出"已存到本机"的提示（必须与"已下发设备"能区分开）
+  ok   设备 cv 仍是 38972（设备侧门限完全没变，板子不会因此报警）
+  ok   两边不同时提示里带上「仅存本机」，不会把人推去反复点下发
+  ok   越界门限（gas=0，下限是 1）被整条拒绝，本机那份不变
+  ok   并且弹框说明为什么不能存
+
+汇总
+--------------------
+  通过 164 项，失败 0 项
+
+  结论：小程序与固件在门限、量程、指纹、报文四个层面完全对齐。
+  仍只能在设备上验的部分：巴法云的 /set 推送是否真的到达、蜂鸣器响不响。

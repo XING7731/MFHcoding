@@ -1,0 +1,152 @@
+/* pages/rooms/rooms.wxss */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 24rpx;
+  box-sizing: border-box;
+}
+
+/* ---------------- 汇总 ---------------- */
+.summary {
+  display: flex;
+  margin: 24rpx 24rpx 0;
+  padding: 28rpx 0;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(31, 41, 55, 0.05);
+}
+
+.summary__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary__item + .summary__item {
+  border-left: 1rpx solid var(--line);
+}
+
+.summary__value {
+  font-size: 48rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-1);
+}
+
+.summary__value--on {
+  color: var(--success);
+}
+
+.summary__value--warn {
+  color: var(--danger);
+}
+
+.summary__label {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+/* ---------------- 房间卡片 ---------------- */
+.room-card {
+  margin: 24rpx 24rpx 0;
+  padding: 28rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  border: 2rpx solid transparent;
+  box-shadow: 0 4rpx 20rpx rgba(31, 41, 55, 0.05);
+  box-sizing: border-box;
+}
+
+.room-card--active {
+  border-color: rgba(25, 118, 210, 0.35);
+  background-color: rgba(25, 118, 210, 0.03);
+}
+
+.room-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.room-card__title {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.room-card__name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.room-card__topic {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.room-card__values {
+  display: flex;
+  margin-top: 24rpx;
+}
+
+.room-card__value {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card__number {
+  display: flex;
+  align-items: baseline;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.room-card__unit {
+  margin-left: 4rpx;
+  font-size: 24rpx;
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+.room-card__label {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.room-card__warn {
+  margin-top: 20rpx;
+  padding: 14rpx 18rpx;
+  font-size: 24rpx;
+  color: var(--danger);
+  background-color: #fdecec;
+  border-radius: 12rpx;
+}
+
+.room-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+/* ---------------- 其它 ---------------- */
+.empty {
+  margin: 80rpx 24rpx 0;
+  font-size: 28rpx;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.action-row {
+  margin: 32rpx 24rpx 0;
+}

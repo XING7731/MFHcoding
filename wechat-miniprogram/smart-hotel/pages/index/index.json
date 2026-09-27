@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "trend-chart": "/components/trend-chart/index"
+  },
+  "navigationBarTitleText": "未来酒店·智慧监控",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

@@ -1,0 +1,5 @@
+# name<TAB>message  (小程序 buildConfigMsg 必须逐字节生成同样的字符串)
+default	{"cfg":1,"tHi":40,"tLo":10,"hHi":90,"hLo":20,"gas":50,"hrLo":50,"hrHi":120,"sp":90,"buz":1}
+demo-temp-low	{"cfg":1,"tHi":25,"tLo":10,"hHi":90,"hLo":20,"gas":50,"hrLo":50,"hrHi":120,"sp":90,"buz":1}
+all-changed	{"cfg":1,"tHi":45,"tLo":-5,"hHi":70,"hLo":30,"gas":25,"hrLo":60,"hrHi":140,"sp":94,"buz":0}
+zeros-edges	{"cfg":1,"tHi":60,"tLo":-20,"hHi":100,"hLo":0,"gas":1,"hrLo":20,"hrHi":200,"sp":50,"buz":0}

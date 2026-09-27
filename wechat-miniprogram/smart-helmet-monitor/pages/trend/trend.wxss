@@ -1,0 +1,198 @@
+/* pages/trend/trend.wxss —— 趋势图（canvas 折线）与报警记录 */
+
+.page { padding-bottom: 80rpx; }
+
+/* ---------- 指标切换 ---------- */
+.tabs {
+  white-space: nowrap;
+  margin-bottom: 6rpx;
+}
+.tab {
+  display: inline-block;
+  padding: 12rpx 26rpx;
+  margin: 0 12rpx 12rpx 0;
+  border-radius: 999rpx;
+  background: #fff;
+  border: 1rpx solid var(--line);
+  color: var(--sub);
+  font-size: 26rpx;
+}
+.tab-on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---------- 图例 ---------- */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.lg-item {
+  display: flex;
+  align-items: baseline;
+  margin-right: 34rpx;
+  margin-bottom: 4rpx;
+}
+.lg-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  flex: none;
+  margin-right: 10rpx;
+  align-self: center;
+}
+.lg-name {
+  font-size: 24rpx;
+  color: var(--sub);
+  margin-right: 10rpx;
+}
+.lg-val {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.lg-unit {
+  font-size: 22rpx;
+  font-weight: 400;
+  color: var(--sub);
+}
+
+/* ---------- 折线画布 ---------- */
+/* 宽高必须由样式定死：canvas 的背板尺寸由 JS 按 devicePixelRatio 设置，
+   而查询接口拿到的是这里的布局尺寸。两者不能混。 */
+.chart-canvas {
+  display: block;
+  width: 100%;
+  height: 300rpx;
+  margin: 18rpx 0 4rpx;
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 20rpx;
+  color: var(--sub);
+  margin-bottom: 6rpx;
+}
+
+.draw-note {
+  display: block;
+  font-size: 21rpx;
+  color: #8a6412;
+  background: #fffaf0;
+  border-radius: 10rpx;
+  padding: 10rpx 14rpx;
+  margin-top: 10rpx;
+  line-height: 1.5;
+}
+
+.chart-note {
+  display: block;
+  font-size: 21rpx;
+  color: var(--sub);
+  line-height: 1.7;
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+/* ---------- 每个指标的统计值 ---------- */
+.stat {
+  margin-top: 16rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid var(--line);
+}
+.stat-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.stat-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+.stat-n {
+  margin-left: auto;
+  font-size: 21rpx;
+  color: var(--sub);
+}
+.stat-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.sg {
+  flex: 0 0 50%;
+  box-sizing: border-box;
+  padding: 8rpx 0;
+  display: flex;
+  align-items: baseline;
+}
+.sg-k {
+  font-size: 23rpx;
+  color: var(--sub);
+  width: 76rpx;
+  flex: none;
+}
+.sg-v {
+  font-size: 26rpx;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 报警记录 ---------- */
+.alarm-item {
+  background: #fff;
+  border-radius: 14rpx;
+  border-left: 8rpx solid var(--sub);
+  padding: 18rpx 22rpx;
+  margin-bottom: 14rpx;
+}
+.alarm-warn   { border-left-color: var(--warn);   background: #fffaf0; }
+.alarm-danger { border-left-color: var(--danger); background: #fff5f5; }
+
+.alarm-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.alarm-cn   { font-size: 30rpx; font-weight: 700; color: var(--text); }
+.alarm-time { font-size: 22rpx; color: var(--sub); }
+.alarm-code { display: block; font-size: 22rpx; color: var(--sub); margin-top: 6rpx; }
+
+/* ---------- 空状态 ---------- */
+.empty {
+  background: #fff;
+  border: 1rpx dashed var(--line);
+  border-radius: 16rpx;
+  padding: 40rpx 28rpx;
+  text-align: center;
+}
+.empty-sm { padding: 28rpx; }
+.empty-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12rpx;
+}
+.empty-sub {
+  display: block;
+  font-size: 23rpx;
+  color: var(--sub);
+  margin-top: 8rpx;
+}
+
+/* ---------- 脚注 ---------- */
+.footnote {
+  display: block;
+  font-size: 21rpx;
+  color: #9aa5b5;
+  line-height: 1.7;
+  margin-top: 28rpx;
+  padding: 0 6rpx;
+}

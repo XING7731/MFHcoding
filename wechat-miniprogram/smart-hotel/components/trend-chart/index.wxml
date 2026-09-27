@@ -1,0 +1,15 @@
+<!--components/trend-chart/index.wxml-->
+<view class="trend-chart" style="height: {{height}}px;">
+  <canvas
+    wx:if="{{hasData}}"
+    type="2d"
+    id="trend-canvas"
+    class="trend-canvas"
+    style="width: 100%; height: {{height}}px;"
+  ></canvas>
+
+  <view wx:else class="trend-empty">
+    <view class="trend-empty__dot"></view>
+    <text class="trend-empty__text">{{emptyText}}</text>
+  </view>
+</view>

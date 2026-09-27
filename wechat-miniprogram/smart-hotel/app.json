@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/rooms/rooms",
+    "pages/setting/setting"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "未来酒店·智慧监控",
+    "backgroundColor": "#f4f7fb",
+    "backgroundTextStyle": "light"
+  },
+  "usingComponents": {
+    "van-button": "/dist/button/index",
+    "van-field": "/dist/field/index",
+    "van-notice-bar": "/dist/notice-bar/index",
+    "van-stepper": "/dist/stepper/index",
+    "van-switch": "/dist/switch/index",
+    "van-tab": "/dist/tab/index",
+    "van-tabs": "/dist/tabs/index"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {}
+}

@@ -1,0 +1,36 @@
+/* components/trend-chart/index.wxss */
+.trend-chart {
+  position: relative;
+  width: 100%;
+}
+
+.trend-canvas {
+  display: block;
+  width: 100%;
+}
+
+.trend-empty {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.trend-empty__dot {
+  width: 96rpx;
+  height: 96rpx;
+  margin-bottom: 20rpx;
+  border-radius: 50%;
+  border: 4rpx dashed #d7dee8;
+  box-sizing: border-box;
+}
+
+.trend-empty__text {
+  font-size: 26rpx;
+  color: #9aa4b0;
+}

@@ -1,0 +1,13 @@
+UV4   : C:\apps\keil5\UV4\UV4.exe
+工程  : C:\Users\27362\Desktop\New Folder\smart-helmet-freertos\MDK-ARM\smart-helmet-freertos.uvprojx
+模式  : Rebuild(全量)
+命令  : C:\apps\keil5\UV4\UV4.exe -r "C:\Users\27362\Desktop\New Folder\smart-helmet-freertos\MDK-ARM\smart-helmet-freertos.uvprojx" -j0 -o "C:\Users\27362\Desktop\New Folder\smart-helmet-freertos\MDK-ARM\build_report.uv4.log"
+
+UV4 退出码 = 0  (0=无错无警 / 1=有警告 / 2=有错误 / 3=致命)
+
+Error   = 0
+Warning = 0
+尺寸    : Code=46454 RO-data=2210 RW-data=444 ZI-data=18108
+
+结论    : 0 Error / 0 Warning  ✔
+HEX     : MDK-ARM\smart-helmet-freertos\smart-helmet-freertos.hex  137052 字节  2026-09-23 16:46:31
